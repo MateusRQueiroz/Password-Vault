@@ -5,6 +5,8 @@ import base64
 import os
 
 class Password():
+    ''' Initializes a Password object with a platform name, a password, and the master password for encryption.
+        It generates a random salt value, derives a key from the master password, and creates a Fernet object'''
     def __init__(self, platform, password, master_password):
         self.platform = platform
         self.salt = os.urandom(16)
@@ -13,6 +15,8 @@ class Password():
         self.encrypted_password = self.encrypt_password(password)
         self.decrypted_password = None
 
+    ''' Derives a key through PBKDF2, utilizing a master password provided by the user and a random salt value.
+        Ensures that key is in appropriate format and returns key. '''
     def derive_key(self, master_password): 
         kdf = PBKDF2HMAC(
             algorithm=hashes.SHA256(),

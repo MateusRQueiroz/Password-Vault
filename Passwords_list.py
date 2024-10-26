@@ -1,12 +1,15 @@
 import os
 import stat 
 
+''' Initializes a passwords list object.'''
 class Passwords_list():
     def __init__(self):
         self.password_book = {}
         self.password_object_list = []
         self.decrypted_password_list = []
     
+    ''' Adds a password a file the password_book dictionary, to a password object list, and to a file.
+        Ensures that the file can only be written in and read by the owner.'''
     def add_password(self, password): 
         self.password_book[password.platform] = password.encrypted_password
         self.password_object_list.append(password)
@@ -17,6 +20,7 @@ class Passwords_list():
     def get_password_book(self):
         return self.password_book
     
+    ''' Displays passwords in a separate file'''
     def view_passwords(self, master_password):
         updated_lines = []
         try: 
