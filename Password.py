@@ -3,7 +3,7 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 import base64
 import os
-
+from Passwords_list import Passwords_list
 
 class Password():
     def __init__(self, platform, password, master_password):
@@ -36,11 +36,16 @@ class Password():
             self.decrypted_password = self.f.decrypt(self.encrypted_password).decode()
             return self.decrypted_password
         except InvalidToken:
-            return "The program is unable to decrypt the password"
+            print("The program is unable to decrypt the password")
     
-    def change_password(self, password_book, new_password):
-        self.password = new_password
-        password_book[self.platform] = self.encrypt_password()
+    def change_password(self, passwords_list, new_password, master_password):
+        try: 
+            if self.decrypt_password(master_password):
+                self.password = new_password
+                passwords_list.password_book[self.platform] = self.encrypt_password()
+                print("Password successfully changed")
+        except:
+            print("Unable to change the password")
 
     def remove_password(self, password_book): 
         del password_book[self.platform]

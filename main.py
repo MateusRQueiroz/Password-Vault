@@ -22,4 +22,6 @@ passwords_list1.add_password(password2)
 passwords_list1.add_password(password3)
 passwords_list1.add_password(password1)
 
+
+password4.change_password(passwords_list1, 'Simple123', '321')
 passwords_list1.view_passwords('321')
