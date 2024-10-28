@@ -1,6 +1,7 @@
 from cryptography.fernet import Fernet, InvalidToken
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+from Passwords_list import Passwords_list
 import base64
 import os
 
@@ -48,8 +49,9 @@ class Password():
         except:
             print("Unable to change the password")
 
-    def remove_password(self, password_book): 
-        del password_book[self.platform]
+    def remove_password(self, passwords_list): 
+        passwords_list.delete_password_from_list(self)
+
 
     def display_password(self, master_password): 
         self.decrypted_password = self.decrypt_password(master_password)

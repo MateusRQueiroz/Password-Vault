@@ -29,3 +29,5 @@ passwords_list1.view_passwords('321')
 password5 = Password('Apple', 'idk', '321')
 passwords_list1.add_password(password5)
 passwords_list1.view_passwords('321')
+
+password5.remove_password(passwords_list1)

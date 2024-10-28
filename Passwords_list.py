@@ -19,6 +19,20 @@ class Passwords_list():
     
     def get_password_book(self):
         return self.password_book
+
+    def delete_password_from_list(self, password_instance): 
+        updated_lines = []
+        with open('Passwords_List', 'r+') as passwords_file:
+            lines = passwords_file.readlines()
+            passwords_file.seek(0)
+            for line in lines: 
+                if password_instance.platform in line: 
+                    continue
+                else:
+                    updated_lines.append(line)
+            for updated_line in updated_lines:
+                passwords_file.write(updated_line)
+            passwords_file.truncate()
     
     ''' Displays passwords in a separate file'''
     def view_passwords(self, master_password):
