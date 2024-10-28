@@ -38,26 +38,27 @@ class Passwords_list():
     
     ''' Displays passwords in a separate file'''
     def view_passwords(self, master_password):
-        updated_lines = []
         try: 
+            updated_lines = []
             with open('Passwords_List', 'r+') as passwords_file:
                 lines = passwords_file.readlines() 
-                passwords_file.seek(0)
-                for line in lines:
-                    platform, encrypted_password = line.split(': ', 1)
-                    encrypted_password = encrypted_password.strip()
-                    for password in self.password_object_list:
-                        if password.platform == platform.strip(): 
-                            decrypted_password = password.decrypt_password(master_password)
-                            updated_lines.append(f'{platform}: {decrypted_password}\n')
+
+            for line in lines:
+                platform, encrypted_password = line.split(': ', 1)
+                encrypted_password = encrypted_password.strip()
+                for password in self.password_object_list:
+                    if password.platform == platform.strip(): 
+                        decrypted_password = password.decrypt_password(master_password)
+                        updated_lines.append(f'{platform}: {decrypted_password}\n')
+        
+            with open('Passwords_List', 'w') as passwords_file:
                 passwords_file.writelines(updated_lines)
-                passwords_file.truncate()
-                passwords_file.close()
+                
         except PermissionError: 
             print("You don't have permission to access this file")
         except Exception as e: 
             print(f'Error {e} occurred')
-        time.sleep(60)
+        time.sleep(5)
         self.encrypt_file()
 
     def encrypt_file(self): 

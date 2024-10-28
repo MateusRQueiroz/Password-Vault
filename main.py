@@ -1,34 +1,54 @@
 from cryptography.fernet import Fernet
 from Password import Password
 from Passwords_list import Passwords_list
+import time 
 
-password1 = Password('Facebook', '1234', '321')
-password2 = Password('Twitter', '1234124', '321')
-password3 = Password('Crunchyroll', '0312', '321')
-password4 = Password('Netflix', '3213214', '321')
+passwords_list = Passwords_list()
+password_objects = {}
 
-password1.encrypt_password('1234')
-password2.encrypt_password('1234124')
-password3.encrypt_password('0312')
-password4.encrypt_password('3213214')
+if __name__ == "__main__":
+    username = input('''
+    This is a safe password manager. \n             
+    Username: ''')
+    master_password = input('''    Master Password: ''')
+    user = True
 
+    while user == True: 
+        user_command = int(input('''
 
-print(password1.encrypted_password)
+        1) Add Password
+        2) Change Password
+        3) Remove Password
+        4) View Password
+        5) View Password List
 
-passwords_list1 = Passwords_list()
+    Select a number: '''))
 
+        if user_command == 1:
+            platform = input('\nPlatform: ')
+            password = input('Password: ')
+            password_object  = Password(platform, password, master_password)
+            passwords_list.add_password(password_object)
+            password_objects[platform] = password_object
 
-passwords_list1.add_password(password4)
-passwords_list1.add_password(password2)
-passwords_list1.add_password(password3)
-passwords_list1.add_password(password1)
+        elif user_command == 2: 
+            platform = input('\nPlatform: ')
+            new_password = input('New Password: ')
+            password_objects[platform].change_password(passwords_list, new_password, master_password)
 
-
-password4.change_password(passwords_list1, 'Simple123', '321')
-'''passwords_list1.view_passwords('321')''' # Needs to be updated 
-
-password5 = Password('Apple', 'idk', '321')
-passwords_list1.add_password(password5)
-passwords_list1.view_passwords('321')
-
-''''password5.remove_password(passwords_list1)''' # Needs to be updated
+        elif user_command == 3: 
+            platform = input('\nPlatform: ')
+            password_objects[platform].remove_password(passwords_list)
+        
+        elif user_command == 4: 
+            platform = input('\nPlatform: ')
+            print(password_objects[platform].decrypt_password(master_password))
+        
+        elif user_command == 5:
+            passwords_list.view_passwords(master_password)
+        
+        answer = input('''\n Do you want to continue? ''').lower()
+        if answer == 'yes':
+            user = True
+        else:
+            user = False
