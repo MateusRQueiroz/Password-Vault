@@ -13,6 +13,7 @@ password3.encrypt_password('0312')
 password4.encrypt_password('3213214')
 
 
+print(password1.encrypted_password)
 
 passwords_list1 = Passwords_list()
 
@@ -24,10 +25,10 @@ passwords_list1.add_password(password1)
 
 
 password4.change_password(passwords_list1, 'Simple123', '321')
-passwords_list1.view_passwords('321')
+'''passwords_list1.view_passwords('321')''' # Needs to be updated 
 
 password5 = Password('Apple', 'idk', '321')
 passwords_list1.add_password(password5)
 passwords_list1.view_passwords('321')
 
-password5.remove_password(passwords_list1)
+''''password5.remove_password(passwords_list1)''' # Needs to be updated

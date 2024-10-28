@@ -1,5 +1,6 @@
 import os
 import stat 
+import time 
 
 ''' Initializes a passwords list object.'''
 class Passwords_list():
@@ -8,7 +9,7 @@ class Passwords_list():
         self.password_object_list = []
         self.decrypted_password_list = []
     
-    ''' Adds a password a file the password_book dictionary, to a password object list, and to a file.
+    ''' Adds a password a file to the password_book dictionary, to a password object list, and to a file.
         Ensures that the file can only be written in and read by the owner.'''
     def add_password(self, password): 
         self.password_book[password.platform] = password.encrypted_password
@@ -20,6 +21,7 @@ class Passwords_list():
     def get_password_book(self):
         return self.password_book
 
+    ''' Deletes password from the file '''
     def delete_password_from_list(self, password_instance): 
         updated_lines = []
         with open('Passwords_List', 'r+') as passwords_file:
@@ -50,9 +52,30 @@ class Passwords_list():
                             updated_lines.append(f'{platform}: {decrypted_password}\n')
                 passwords_file.writelines(updated_lines)
                 passwords_file.truncate()
+                passwords_file.close()
         except PermissionError: 
             print("You don't have permission to access this file")
         except Exception as e: 
             print(f'Error {e} occurred')
+        time.sleep(60)
+        self.encrypt_file()
+
+    def encrypt_file(self): 
+        updated_lines = []
+        with open('Passwords_List', 'r+') as passwords_file: 
+            lines = passwords_file.readlines()
+            passwords_file.seek(0)
+            for line in lines:
+                platform, decrypted_password = line.split(': ', 1)
+                decrypted_password.strip()
+                for password in self.password_object_list:
+                    if password.platform == platform.strip(): 
+                        encrypted_password = password.encrypted_password
+                        updated_lines.append(f'{platform}: {encrypted_password}\n')
+            passwords_file.seek(0)
+            passwords_file.writelines(updated_lines)
+            passwords_file.truncate()
+            passwords_file.close()
+
 
         
