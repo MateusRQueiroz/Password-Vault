@@ -1,7 +1,6 @@
 from cryptography.fernet import Fernet
 from Password import Password
 from Passwords_list import Passwords_list
-import time 
 
 passwords_list = Passwords_list()
 password_objects = {}
@@ -38,7 +37,7 @@ if __name__ == "__main__":
 
         elif user_command == 3: 
             platform = input('\nPlatform: ')
-            password_objects[platform].remove_password(passwords_list)
+            passwords_list.delete_password_from_list(password_objects[platform])
         
         elif user_command == 4: 
             platform = input('\nPlatform: ')

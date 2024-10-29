@@ -49,10 +49,6 @@ class Password():
         except:
             print("Unable to change the password")
 
-    def remove_password(self, passwords_list): 
-        passwords_list.delete_password_from_list(self)
-
-
     def display_password(self, master_password): 
         self.decrypted_password = self.decrypt_password(master_password)
         print(self.decrypted_password)
