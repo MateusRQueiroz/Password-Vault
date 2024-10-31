@@ -1,54 +1,51 @@
 from cryptography.fernet import Fernet, InvalidToken
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-from Passwords_list import Passwords_list
 import base64
-import os
 
 class Password():
-    ''' Initializes a Password object with a platform name, a password, and the master password for encryption.
-        It generates a random salt value, derives a key from the master password, and creates a Fernet object'''
-    def __init__(self, platform, password, master_password):
+    # Initiates a password object with platform, password (that is instantly encrypted), a master_password
+    # and a salt (which are instantly transformed into a key)
+    def __init__(self, platform, password, master_password, salt):
         self.platform = platform
-        self.salt = os.urandom(16)
-        self.key = self.derive_key(master_password)
+        self.salt = bytes.fromhex(salt)
+        self.key = self.derive_key(master_password, self.salt)
         self.f = Fernet(self.key)
-        self.encrypted_password = self.encrypt_password(password)
+        if password:
+            self.encrypted_password = self.encrypt_password(password)
+        else: 
+            None
         self.decrypted_password = None
 
-    ''' Derives a key through PBKDF2, utilizing a master password provided by the user and a random salt value.
-        Ensures that key is in appropriate format and returns key. '''
-    def derive_key(self, master_password): 
+    # Derives key from master_password and salt utilizing PBKDF2 and hashes
+    # Ensures key is in suitable format. Returns key 
+    def derive_key(self, master_password, salt): 
         kdf = PBKDF2HMAC(
             algorithm=hashes.SHA256(),
             length=32,
-            salt = self.salt,
+            salt = salt,
             iterations=10000, )
-        self.key = base64.urlsafe_b64encode(kdf.derive(master_password.encode()))
-        return self.key
+        key = base64.urlsafe_b64encode(kdf.derive(master_password.encode()))
+        return key
 
+    # Encrypts password with fernet object (made with key) and returns it.
     def encrypt_password(self, password):
         if self.f is None:
             self.f = Fernet(self.key)
-        self.encrypted_password = self.f.encrypt(password.encode())
+        self.encrypted_password = self.f.encrypt(password.encode()).decode()
         return self.encrypted_password
     
-    def decrypt_password(self, master_password): 
-        self.derive_key(master_password)
+    # Decrypts password utilizing the fernet object
+    def decrypt_password(self): 
         try: 
             self.decrypted_password = self.f.decrypt(self.encrypted_password).decode()
             return self.decrypted_password
         except InvalidToken:
             print("The program is unable to decrypt the password")
     
+    
     def change_password(self, passwords_list, new_password, master_password):
-        try: 
-            if self.decrypt_password(master_password):
-                passwords_list.password_book[self.platform] = self.encrypt_password(new_password)
-                print("Password successfully changed")
-        except:
-            print("Unable to change the password")
+        pass
 
     def display_password(self, master_password): 
-        self.decrypted_password = self.decrypt_password(master_password)
-        print(self.decrypted_password)
+        pass

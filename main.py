@@ -1,53 +1,67 @@
 from cryptography.fernet import Fernet
 from Password import Password
 from Passwords_list import Passwords_list
+from User import User
 
-passwords_list = Passwords_list()
-password_objects = {}
-
-if __name__ == "__main__":
-    username = input('''
-    This is a safe password manager. \n             
-    Username: ''')
-    master_password = input('''    Master Password: ''')
+def main():
+    # Generates a User object, which creates a json file and stores the contents of that file in a users (dictionary)
+    user_file = User()
     user = True
-
-    while user == True: 
-        user_command = int(input('''
-
-        1) Add Password
-        2) Change Password
-        3) Remove Password
-        4) View Password
-        5) View Password List
-
-    Select a number: '''))
-
-        if user_command == 1:
-            platform = input('\nPlatform: ')
-            password = input('Password: ')
-            password_object  = Password(platform, password, master_password)
-            passwords_list.add_password(password_object)
-            password_objects[platform] = password_object
-
-        elif user_command == 2: 
-            platform = input('\nPlatform: ')
-            new_password = input('New Password: ')
-            password_objects[platform].change_password(passwords_list, new_password, master_password)
-
-        elif user_command == 3: 
-            platform = input('\nPlatform: ')
-            passwords_list.delete_password_from_list(password_objects[platform])
-        
-        elif user_command == 4: 
-            platform = input('\nPlatform: ')
-            print(password_objects[platform].decrypt_password(master_password))
-        
-        elif user_command == 5:
-            passwords_list.view_passwords(master_password)
-        
-        answer = input('''\n Do you want to continue? ''').lower()
-        if answer == 'yes':
-            user = True
-        else:
+    while user: 
+        user_action = input('\nWould you like to (R)egister, (L)ogin, or (Q)uit? ')
+        # User wants to register
+        if user_action == 'R': 
+            username = input('\nEnter an username: ')
+            master_password = input('\nEnter a master password: ')
+            user_file.register_user(username, master_password)
+        # User wants to log-in 
+        elif user_action == 'L': 
+            username = input('\nEnter your username: ')
+            master_password = input('\nEnter master password: ')
+            # Retrieves user's information from users (dictionary)
+            user_data = user_file.users.get(username)
+            if user_data: 
+                # Sets salt equal to stored salt in the dictionary, and derives the key from master password and the given salt
+                salt = user_data['salt']
+                key = user_file.derive_key(master_password, bytes.fromhex(salt))
+                # Creates fernet object from key
+                fernet = Fernet(key)
+                try: 
+                    # Verifies whether the master password is correct through trying to decrypt the hashed password
+                    fernet.decrypt(user_data['hashed_password'].encode())
+                    print('Login successful!')
+                    # Creates a Passwords_list object with the user_data, which will store the 'passwords' key of user data in a separate dictionary
+                    passwords_list = Passwords_list(user_data)
+                    login = True
+                    while login == True: 
+                        user_action = input('''\nWould you like to: 
+1) Add Password
+2) View Passwords
+3) Logout\n''')
+                        if user_action == "1": 
+                            platform = input('Enter platform: ')
+                            password = input('Enter password: ')
+                            new_password = Password(platform, password, master_password, salt)
+                            passwords_list.add_password(new_password)
+                            # Stores the contents of the updated password_book
+                            user_data['passwords'] = passwords_list.password_book
+                            # Dumps all updates into json file
+                            user_file.save_user_data()
+                        elif user_action == "2": 
+                            passwords_list.view_passwords(master_password, salt)
+                        elif user_action == "3": 
+                            login = False
+                except Exception as e:
+                    print(e)
+            else: 
+                print('User not recognized.')
+        elif user_action == 'Q':
             user = False
+if __name__ == "__main__":
+    main()
+
+
+
+
+
+

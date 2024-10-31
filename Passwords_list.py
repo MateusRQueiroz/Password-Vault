@@ -1,82 +1,31 @@
-import os
-import stat 
-import time 
+from Password import Password 
 
-''' Initializes a passwords list object.'''
 class Passwords_list():
-    def __init__(self):
-        self.password_book = {}
-        self.password_object_list = []
-        self.decrypted_password_list = []
+    # Creates a separate dictionary to store the users_data dictionary key of passwords (which includes a nested dictionary platforms and encrypted passwords)
+    def __init__(self, users_data):
+        self.password_book = users_data.get('passwords', {})
     
-    ''' Adds a password a file to the password_book dictionary, to a password object list, and to a file.
-        Ensures that the file can only be written in and read by the owner.'''
+    # Receives a password object 
+    # Accesses the object's encrypted password and stores it in the password_book dictionary
     def add_password(self, password): 
         self.password_book[password.platform] = password.encrypted_password
-        self.password_object_list.append(password)
-        with open('Passwords_List', 'a') as passwords_file: 
-            passwords_file.write(f'{password.platform}: {password.encrypted_password.decode()}\n')
-        os.chmod('Passwords_List', stat.S_IRUSR | stat.S_IWUSR)
+        print(f'Password for {password.platform} added successfully.')
+
+    def delete_password_from_list(self): 
+        pass
     
-    def get_password_book(self):
-        return self.password_book
-
-    ''' Deletes password from the file '''
-    def delete_password_from_list(self, password_instance): 
-        updated_lines = []
-        with open('Passwords_List', 'r+') as passwords_file:
-            lines = passwords_file.readlines()
-            passwords_file.seek(0)
-            for line in lines: 
-                if password_instance.platform in line: 
-                    continue
-                else:
-                    updated_lines.append(line)
-            for updated_line in updated_lines:
-                passwords_file.write(updated_line)
-            passwords_file.truncate()
-    
-    ''' Displays passwords in a separate file'''
-    def view_passwords(self, master_password):
-        try: 
-            updated_lines = []
-            with open('Passwords_List', 'r+') as passwords_file:
-                lines = passwords_file.readlines() 
-
-            for line in lines:
-                platform, encrypted_password = line.split(': ', 1)
-                encrypted_password = encrypted_password.strip()
-                for password in self.password_object_list:
-                    if password.platform == platform.strip(): 
-                        decrypted_password = password.decrypt_password(master_password)
-                        updated_lines.append(f'{platform}: {decrypted_password}\n')
-        
-            with open('Passwords_List', 'w') as passwords_file:
-                passwords_file.writelines(updated_lines)
-                
-        except PermissionError: 
-            print("You don't have permission to access this file")
-        except Exception as e: 
-            print(f'Error {e} occurred')
-        time.sleep(5)
-        self.encrypt_file()
-
-    def encrypt_file(self): 
-        updated_lines = []
-        with open('Passwords_List', 'r+') as passwords_file: 
-            lines = passwords_file.readlines()
-            passwords_file.seek(0)
-            for line in lines:
-                platform, decrypted_password = line.split(': ', 1)
-                decrypted_password.strip()
-                for password in self.password_object_list:
-                    if password.platform == platform.strip(): 
-                        encrypted_password = password.encrypted_password
-                        updated_lines.append(f'{platform}: {encrypted_password}\n')
-            passwords_file.seek(0)
-            passwords_file.writelines(updated_lines)
-            passwords_file.truncate()
-            passwords_file.close()
+    # Receives the user's master password and unique salt 
+    # Separates the platforms from the encrypted passwords in the password_book objects, iterating through them
+        # For each iteration, it creates a new Password object instance, using the platform, master password and salt 
+        # Assigns a value to the encrypted password of the Password object equal to the encrypted password of the corresponding password in the password book
+        # If the program is able to decrypt the Password object's new encrypted password, it will print the platform and decrypted object for that iteration
+    def view_passwords(self, master_password, salt):
+        for platform, encrypted_password in self.password_book.items():
+            password_instance = Password(platform, None, master_password, salt)
+            password_instance.encrypted_password = encrypted_password
+            if password_instance.decrypt_password(): 
+                print(f'{platform}: {password_instance.decrypt_password()}')
+            else:
+                print(f'Failed to decrypt password for {platform}')
 
 
-        
