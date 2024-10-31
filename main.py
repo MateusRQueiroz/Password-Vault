@@ -2,11 +2,12 @@ from cryptography.fernet import Fernet
 from Password import Password
 from Passwords_list import Passwords_list
 from User import User
-from tkinter import *
 from PIL import Image, ImageTk
+import tkinter as tk
+from tkinter import PhotoImage, Label, Button
 
 def main():
-    window = Tk()
+    window = tk.Tk()
     window.title('Password Vault')
     icon = PhotoImage(file='lock photo.png')
     window.iconphoto(False, icon)
@@ -14,35 +15,36 @@ def main():
     window.geometry('500x500')
 
     label = Label(window, bg='light grey')
-    label.grid(row=0, column=0, columnspan=4, padx=10, pady=10)
+    label.grid(row=0, column=0, columnspan=1, pady=10)
 
     image = Image.open('lock photo.png')
     resized_image = image.resize((300, 300), Image.LANCZOS)
     new_image = ImageTk.PhotoImage(resized_image)
-
     label.config(image=new_image)
     label.image = new_image 
 
-    username_label = Label(window, text='Username', bg='light grey')
-    username_label.grid(row=1, column=1, padx=5, pady=10)
+    user_info = tk.Frame(window, bg = 'light grey')
+    user_info.grid()
 
-    master_password_label = Label(window, text='Master Password', bg='light grey')
-    master_password_label.grid(row=2, column=1, padx=5, pady=10)
+    tk.Label(user_info, text='Username', bg = 'light grey').grid(column=0, row=0)
+    username_entry = tk.Entry(user_info, bg='dark grey')
+    username_entry.grid(column=1, row=0)
 
-    username_entry = Entry(window, bg='dark grey')
-    username_entry.grid(row=1, column=2, padx=5, pady=10)
+    tk.Label(user_info, text='Master Password', bg = 'light grey').grid(column=0, row=1)
+    master_password_entry = tk.Entry(user_info, show='*', bg='dark grey')
+    master_password_entry.grid(column=1, row=1, padx = 10)
 
-    master_password_entry = Entry(window, show='*', bg='dark grey')
-    master_password_entry.grid(row=2, column=2, padx=5, pady=10)
+    register_button = Button(user_info, text='Register', padx=5, pady=5)
+    register_button.grid(column=2, row=0, padx=5, pady=5)
 
-    register_button = Button(window, text='Register', padx=5, pady=5)
-    register_button.grid(column=1, row=3, padx=5, pady=10)
-
-    login_button = Button(window, text='Login', padx=5, pady=5)
-    login_button.grid(column=2, row=3, padx=5, pady=10)
+    login_button = Button(user_info, text='Login', padx=5, pady=5)
+    login_button.grid(column=2, row=1, padx=5, pady=5)
 
     window.mainloop()
-  
+
+if __name__ == "__main__":
+    main()
+
     # Generates a User object, which creates a json file and stores the contents of that file in a users (dictionary)
     user_file = User()
     user = True
